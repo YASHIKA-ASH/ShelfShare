@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+
+ShelfShare Dashboard
+
+</title>
+
+<link
+rel="stylesheet"
+href="css/style.css">
+
+<link
+rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<!-- Sidebar -->
+
+<div class="sidebar">
+
+<h2>
+
+📚 ShelfShare
+
+</h2>
+
+<ul>
+
+<li>
+
+<a href="dashboard.html">
+
+🏠 Dashboard
+
+</a>
+
+</li>
+
+<li>
+
+<a href="books.html">
+
+📖 Books
+
+</a>
+
+</li>
+
+<li>
+
+<a href="inventory.html">
+
+📦 Inventory
+
+</a>
+
+</li>
+
+<li>
+
+<a href="borrow.html">
+
+🔄 Borrow
+
+</a>
+
+</li>
+
+<li>
+
+<a href="wishlist.html">
+
+❤️ Wishlist
+
+</a>
+
+</li>
+
+<li>
+
+<a href="reservation.html">
+
+📅 Reservations
+
+</a>
+
+</li>
+
+<li>
+
+<a href="scan.html">
+
+🤖 AI Scan
+
+</a>
+
+</li>
+
+<li>
+
+<a href="#"
+
+onclick="performLogout()">
+
+🚪 Logout
+
+</a>
+
+</li>
+
+</ul>
+
+</div>
+
+<!-- Main -->
+
+<div class="main">
+
+<div class="navbar">
+
+<div>
+
+<h1>
+
+Dashboard
+
+</h1>
+
+<p>
+
+Welcome to ShelfShare
+
+</p>
+
+</div>
+
+<div>
+
+<button
+class="primary-btn"
+onclick="performLogout()">
+
+Logout
+
+</button>
+
+</div>
+
+</div>
+
+<!-- Cards -->
+
+<div class="cards">
+
+<div class="card">
+
+<h3>
+
+Total Books
+
+</h3>
+
+<h1 id="totalBooks">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Available Copies
+
+</h3>
+
+<h1 id="availableCopies">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Borrowed
+
+</h3>
+
+<h1 id="borrowedBooks">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Reservations
+
+</h3>
+
+<h1 id="reservationCount">
+
+0
+
+</h1>
+
+</div>
+
+</div>
+
+<!-- Recent Books -->
+
+<div class="form-card">
+
+<h2>
+
+Latest Books
+
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+
+Title
+
+</th>
+
+<th>
+
+Author
+
+</th>
+
+<th>
+
+Subject
+
+</th>
+
+<th>
+
+Status
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recentBooks">
+</tbody>
+
+</table>
+
+</div>
+
+<!-- Analytics -->
+
+<div class="cards" style="margin-top:30px;">
+
+<div class="card">
+
+<h3>
+
+Most Borrowed Book
+
+</h3>
+
+<h2 id="popularBook">
+
+Loading...
+
+</h2>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Most Active User
+
+</h3>
+
+<h2 id="activeUser">
+
+Loading...
+
+</h2>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Pending Reservations
+
+</h3>
+
+<h2 id="pendingReservations">
+
+0
+
+</h2>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+Wishlist Items
+
+</h3>
+
+<h2 id="wishlistCount">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+<!-- Recent Activity -->
+
+<div class="form-card">
+
+<h2>
+
+Recent Activity
+
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Time</th>
+
+<th>User</th>
+
+<th>Activity</th>
+
+</tr>
+
+</thead>
+
+<tbody id="activityTable">
+
+<tr>
+
+<td colspan="3">
+
+Loading...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script src="js/auth.js"></script>
+
+<script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

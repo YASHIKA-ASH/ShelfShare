@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>ShelfShare</title>
+
+    <link rel="stylesheet"
+        href="css/style.css">
+
+    <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="background">
+
+<div class="overlay"></div>
+
+<div class="main-container">
+
+<div class="left-panel">
+
+<h1>ShelfShare</h1>
+
+<p>
+
+AI Powered Digital Library Management System
+
+</p>
+
+<ul>
+
+<li>📚 Smart Book Search</li>
+
+<li>🤖 AI Book Scanner</li>
+
+<li>📦 Inventory Tracking</li>
+
+<li>❤️ Wishlist</li>
+
+<li>📅 Reservations</li>
+
+<li>📊 Dashboard Analytics</li>
+
+</ul>
+
+</div>
+
+<div class="right-panel">
+
+<div class="logo">
+
+📖
+
+</div>
+
+<div class="tabs">
+
+<button
+
+id="loginTab"
+
+class="active"
+
+onclick="showLogin()">
+
+Login
+
+</button>
+
+<button
+
+id="registerTab"
+
+onclick="showRegister()">
+
+Register
+
+</button>
+
+</div>
+
+<!-- LOGIN -->
+
+<div
+
+id="loginSection"
+
+class="form-section">
+
+<h2>
+
+Welcome Back
+
+</h2>
+
+<p>
+
+Login to continue
+
+</p>
+
+<div class="input-group">
+
+<label>Email</label>
+
+<input
+
+type="email"
+
+id="loginEmail"
+
+placeholder="Enter email">
+
+</div>
+
+<div class="input-group">
+
+<label>Password</label>
+
+<input
+
+type="password"
+
+id="loginPassword"
+
+placeholder="Enter password">
+
+</div>
+
+<button
+
+class="primary-btn"
+
+onclick="login()">
+
+Login
+
+</button>
+
+</div>
+
+<!-- REGISTER -->
+
+<div
+
+id="registerSection"
+
+class="form-section hidden">
+
+<h2>
+
+Create Account
+
+</h2>
+
+<p>
+
+Register to start using ShelfShare
+
+</p>
+
+<div class="input-group">
+
+<label>Full Name</label>
+
+<input
+
+type="text"
+
+id="fullName"
+
+placeholder="Full Name">
+
+</div>
+
+<div class="input-group">
+
+<label>Email</label>
+
+<input
+
+type="email"
+
+id="registerEmail"
+
+placeholder="Email">
+
+</div>
+
+<div class="input-group">
+
+<label>Password</label>
+
+<input
+
+type="password"
+
+id="registerPassword"
+
+placeholder="Password">
+
+</div>
+<div class="input-group">
+
+<label>Phone</label>
+
+<input
+type="text"
+id="phone"
+placeholder="Phone Number">
+
+</div>
+
+<div class="input-group">
+
+<label>Role</label>
+
+<select id="role">
+
+<option value="Student">
+Student
+</option>
+
+<option value="Admin">
+Admin
+</option>
+
+</select>
+
+</div>
+
+<button
+class="primary-btn"
+onclick="registerUser()">
+
+Register
+
+</button>
+
+<p
+id="message"
+class="message">
+
+</p>
+
+</div>
+
+<div
+id="loader"
+class="loader hidden">
+
+<div class="spinner"></div>
+
+<p>
+
+Please wait...
+
+</p>
+
+</div>
+
+<div class="footer">
+
+<p>
+
+© 2026 ShelfShare
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script src="js/auth.js"></script>
+
+<script>
+
+function showLogin(){
+
+document
+.getElementById("loginSection")
+.classList
+.remove("hidden");
+
+document
+.getElementById("registerSection")
+.classList
+.add("hidden");
+
+document
+.getElementById("loginTab")
+.classList
+.add("active");
+
+document
+.getElementById("registerTab")
+.classList
+.remove("active");
+
+}
+
+function showRegister(){
+
+document
+.getElementById("registerSection")
+.classList
+.remove("hidden");
+
+document
+.getElementById("loginSection")
+.classList
+.add("hidden");
+
+document
+.getElementById("registerTab")
+.classList
+.add("active");
+
+document
+.getElementById("loginTab")
+.classList
+.remove("active");
+
+}
+
+</script>
+
+</body>
+
+</html>

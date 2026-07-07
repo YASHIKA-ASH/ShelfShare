@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShelfShare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1E4C4;
+    --paper-card:#FFFBF1;
+    --paper-dim:#E7D8B4;
+    --ink:#2B2018;
+    --ink-soft:#6B5843;
+    --ink-faint:#9C8A70;
+    --line: rgba(43,32,24,0.16);
+    --line-strong: rgba(43,32,24,0.55);
+    --pop-red:#D1495B;
+    --pop-mustard:#E3A21D;
+    --pop-teal:#12787D;
+    --pop-green:#2F8F5B;
+    --pop-navy:#2C4A7C;
+    --pop-plum:#7B4B94;
+    --accent:#E3A21D;
+    --accent-soft: rgba(227,162,29,0.16);
+    --lamp:#12787D;
+    --lamp-soft: rgba(18,120,125,0.14);
+    --danger:#D1495B;
+    --good:#2F8F5B;
+    --radius: 14px;
+    --serif: 'Fraunces', serif;
+    --sans: 'Plus Jakarta Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--paper);
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  /* Decorative shelf strip — flat colour blocks, no gradients, no blur */
+  #orb-field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:0.5;}
+  .orb{position:absolute;border-radius:4px 4px 2px 2px;animation:sway 7s ease-in-out infinite;}
+  .orb.o1{width:34px;height:170px;background:var(--pop-red);top:-40px;left:8%;animation-duration:6.5s;}
+  .orb.o2{width:34px;height:130px;background:var(--pop-teal);top:-10px;left:11.6%;animation-duration:8s;animation-delay:-2s;}
+  .orb.o3{width:34px;height:200px;background:var(--pop-navy);bottom:-60px;right:9%;animation-duration:7.2s;animation-delay:-4s;}
+  @keyframes sway{
+    0%,100%{transform:rotate(0deg);}
+    50%{transform:rotate(1.5deg);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .orb{animation:none;}
+  }
+  #app{position:relative;z-index:1;min-height:100vh;}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+
+  /* ---------- Card primitive: flat paper + ink outline + hard offset shadow ---------- */
+  .glass{
+    background:var(--paper-card);
+    border:2px solid var(--ink);
+    box-shadow:5px 5px 0 var(--line-strong);
+    border-radius:var(--radius);
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;justify-content:center;
+    padding:11px 20px;border-radius:10px;border:2px solid var(--ink);
+    background:var(--paper-card);color:var(--ink);font-size:14px;font-weight:700;
+    box-shadow:3px 3px 0 var(--ink);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);}
+  .btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink);}
+  .btn-primary{
+    background:var(--pop-mustard);
+    border-color:var(--ink);color:var(--ink);
+  }
+  .btn-lamp{
+    background:var(--pop-teal);border-color:var(--ink);color:#FBF6E9;
+  }
+  .btn-ghost{background:var(--paper-card);border:2px solid var(--ink);}
+  .btn-danger{background:var(--pop-red);border-color:var(--ink);color:#FBF6E9;}
+  .btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;box-shadow:3px 3px 0 var(--ink);}
+  .btn-sm{padding:7px 14px;font-size:12.5px;box-shadow:2px 2px 0 var(--ink);}
+  .btn-sm:hover{box-shadow:3px 3px 0 var(--ink);}
+
+  input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select,textarea{
+    width:100%;padding:11px 14px;border-radius:9px;border:2px solid var(--line);
+    background:var(--paper-card);color:var(--ink);font-size:14px;outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--ink);box-shadow:2px 2px 0 var(--accent-soft);}
+  label{font-size:12.5px;color:var(--ink-soft);font-weight:700;letter-spacing:.02em;display:block;margin-bottom:6px;}
+  .field{margin-bottom:14px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  ::placeholder{color:var(--ink-faint);}
+
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--pop-red);display:flex;align-items:center;gap:8px;font-weight:700;
+  }
+  .eyebrow::before{content:'';width:16px;height:3px;background:var(--pop-red);display:inline-block;}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;margin:0;}
+  .muted{color:var(--ink-soft);}
+  .tiny{color:var(--ink-faint);font-size:12.5px;}
+
+  /* ---------- Toast ---------- */
+  #toast-wrap{position:fixed;top:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:10px;}
+  .toast{
+    padding:13px 18px;border-radius:10px;font-size:13.5px;font-weight:700;min-width:240px;
+    background:var(--paper-card);border:2px solid var(--ink);
+    box-shadow:4px 4px 0 var(--ink);
+    animation:toast-in .2s ease;
+  }
+  .toast.err{background:var(--pop-red);color:#FBF6E9;}
+  .toast.ok{background:var(--pop-green);color:#FBF6E9;}
+  @keyframes toast-in{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- Auth screen ---------- */
+  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .auth-card{width:100%;max-width:420px;padding:40px 36px;}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+  .brand-mark{
+    width:36px;height:36px;border-radius:6px 6px 3px 3px;
+    background:var(--pop-mustard);border:2px solid var(--ink);
+    box-shadow:2px 2px 0 var(--ink);
+  }
+  .brand-name{font-family:var(--serif);font-size:21px;font-style:italic;font-weight:700;}
+  .auth-title{font-size:30px;line-height:1.15;margin-bottom:6px;}
+  .auth-sub{color:var(--ink-soft);font-size:14px;margin-bottom:28px;}
+  .tabs{display:flex;gap:8px;margin-bottom:24px;background:var(--paper-dim);padding:5px;border-radius:11px;border:2px solid var(--line);}
+  .tab{flex:1;text-align:center;padding:9px;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--ink-soft);}
+  .tab.active{background:var(--pop-mustard);color:var(--ink);}
+
+  /* Little flat "bookshelf" illustration for the auth hero */
+  .shelf-strip{display:flex;align-items:flex-end;gap:5px;height:64px;margin-bottom:22px;}
+  .shelf-strip .spine{border-radius:3px 3px 1px 1px;border:2px solid var(--ink);}
+  .shelf-strip::after{content:'';display:none;}
+
+  /* ---------- Shell ---------- */
+  .shell{display:flex;min-height:100vh;}
+  .sidebar{
+    width:230px;flex-shrink:0;padding:26px 16px;display:flex;flex-direction:column;gap:4px;
+    border-right:2px solid var(--ink);background:var(--paper-card);
+  }
+  .sidebar .brand{padding:0 10px;margin-bottom:26px;}
+  .navlink{
+    display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:9px;
+    color:var(--ink-soft);font-size:14px;font-weight:700;transition:all .15s ease;
+    border:2px solid transparent;
+  }
+  .navlink:hover{background:var(--paper-dim);color:var(--ink);}
+  .navlink.active{background:var(--accent-soft);color:var(--ink);border-color:var(--ink);}
+  .navlink .dot{width:8px;height:8px;border-radius:2px;background:var(--pop-red);opacity:0;transition:opacity .15s;}
+  .navlink.active .dot{opacity:1;}
+  .sidebar-foot{margin-top:auto;padding:12px 10px;}
+
+  .main{flex:1;min-width:0;padding:30px 40px 60px;}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;gap:20px;}
+  .page-title{font-size:28px;}
+  .page-sub{color:var(--ink-soft);font-size:14px;margin-top:4px;}
+
+  .grid{display:grid;gap:18px;}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:1100px){.grid-3,.grid-4{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:720px){.grid-3,.grid-4{grid-template-columns:1fr;} .field-row{grid-template-columns:1fr;} .shell{flex-direction:column;} .sidebar{width:100%;flex-direction:row;overflow-x:auto;border-right:none;border-bottom:2px solid var(--ink);} .sidebar-foot{display:none;} .main{padding:20px;}}
+
+  .stat-card{padding:20px;border-top:6px solid var(--pop-mustard);}
+  .stat-card:nth-child(4n+2){border-top-color:var(--pop-teal);}
+  .stat-card:nth-child(4n+3){border-top-color:var(--pop-red);}
+  .stat-card:nth-child(4n+4){border-top-color:var(--pop-navy);}
+  .stat-num{font-family:var(--serif);font-size:32px;margin-top:6px;}
+  .stat-label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+
+  /* Book card w/ signature "spine" — solid pop colour, no gradient */
+  .book-card{
+    position:relative;padding:18px 18px 18px 24px;overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .book-card::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:8px;
+    background:var(--spine-color, var(--pop-mustard));
+  }
+  .book-card:hover{transform:translate(-2px,-3px);box-shadow:8px 8px 0 var(--ink);}
+  .book-cover{
+    width:100%;aspect-ratio:3/4;border-radius:8px;object-fit:cover;margin-bottom:12px;
+    background:var(--paper-dim);border:2px solid var(--ink);
+  }
+  .book-cover-spine{
+    width:100%;aspect-ratio:3/4;border-radius:8px;margin-bottom:12px;
+    background:var(--spine-color, var(--pop-mustard));border:2px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;padding:14px;text-align:center;
+  }
+  .book-cover-spine span{
+    font-family:var(--serif);font-style:italic;font-weight:600;font-size:15px;color:#FBF6E9;
+    text-shadow:0 1px 0 rgba(0,0,0,0.15);
+  }
+  .book-title{font-family:var(--serif);font-size:17px;line-height:1.3;margin-bottom:3px;}
+  .book-author{color:var(--ink-soft);font-size:13px;margin-bottom:10px;}
+  .book-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+  .chip{
+    font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:999px;
+    background:var(--paper-dim);color:var(--ink-soft);border:1.5px solid var(--line);font-weight:600;
+  }
+  .book-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .card{padding:22px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+
+  .empty{padding:50px 20px;text-align:center;}
+  .empty h3{font-size:19px;margin-bottom:6px;}
+
+  .list-row{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px 18px;border-radius:12px;margin-bottom:10px;
+    background:var(--paper-card);border:2px solid var(--ink);
+  }
+
+  .modal-back{position:fixed;inset:0;background:rgba(43,32,24,0.45);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .modal{width:100%;max-width:440px;padding:28px;}
+
+  .stars{display:flex;gap:4px;}
+  .star{font-size:20px;color:var(--ink-faint);cursor:pointer;}
+  .star.on{color:var(--pop-mustard);}
+
+  .loader{display:inline-block;width:16px;height:16px;border:2.5px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .drop{
+    border:2.5px dashed var(--line-strong);border-radius:12px;padding:34px 20px;text-align:center;
+    cursor:pointer;transition:border-color .15s ease, background .15s ease;
+  }
+  .drop:hover{border-color:var(--ink);background:var(--paper-dim);}
+  .scan-preview{width:100%;max-height:220px;object-fit:contain;border-radius:10px;margin-bottom:14px;border:2px solid var(--ink);}
+
+  .subtabs{display:flex;gap:8px;margin-bottom:22px;}
+  .subtab{padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:700;color:var(--ink-soft);border:2px solid var(--line);background:var(--paper-card);}
+  .subtab.active{background:var(--pop-mustard);color:var(--ink);border-color:var(--ink);}
+
+  .settings-btn{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);border:2px solid transparent;}
+  .settings-btn:hover{background:var(--paper-dim);color:var(--ink);border-color:var(--ink);}
+</style>
+</head>
+<body>
+<div id="orb-field"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div id="toast-wrap"></div>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   ShelfShare frontend — vanilla JS SPA
+   Wired to FastAPI backend endpoints exactly as documented:
+   /users, /books, /scan, /search, /rentals, /reservations,
+   /wishlist, /dashboard
+   ========================================================= */
+
+const state = {
+  apiBase: 'http://localhost:8000',
+  token: null,
+  userId: null,
+  fullName: null,
+  page: 'auth',
+  authTab: 'login',
+  addTab: 'scan',
+  scanResult: null,
+  scanFile: null,
+  cache: {}
+};
+
+// ---------- helpers ----------
+function toast(msg, type='ok'){
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type==='err' ? 'err' : 'ok');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 3200);
+}
+
+function decodeJwt(token){
+  try{
+    const payload = token.split('.')[1];
+    const json = decodeURIComponent(atob(payload.replace(/-/g,'+').replace(/_/g,'/')).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(json);
+  }catch(e){ return {}; }
+}
+
+async function api(path, {method='GET', body=null, isForm=false} = {}){
+  const headers = {};
+  if(!isForm) headers['Content-Type'] = 'application/json';
+  if(state.token) headers['Authorization'] = 'Bearer ' + state.token;
+  let res;
+  try{
+    res = await fetch(state.apiBase + path, {
+      method,
+      headers,
+      body: body ? (isForm ? body : JSON.stringify(body)) : undefined
+    });
+  }catch(e){
+    throw new Error('Could not reach the backend at ' + state.apiBase + '. Is it running, and does it allow CORS from this page?');
+  }
+  let data = null;
+  const text = await res.text();
+  try{ data = text ? JSON.parse(text) : null; }catch(e){ data = text; }
+  if(!res.ok){
+    const detail = (data && data.detail) ? (typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail)) : ('Request failed (' + res.status + ')');
+    throw new Error(detail);
+  }
+  return data;
+}
+
+function escapeHtml(s){
+  if(s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function fmtLabel(key){
+  return key.replace(/_/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+}
+
+// ---------- render dispatch ----------
+function render(){
+  const app = document.getElementById('app');
+  if(state.page === 'auth'){
+    app.innerHTML = renderAuth();
+  } else {
+    app.innerHTML = renderShell();
+  }
+}
+
+// ================= AUTH =================
+function renderAuth(){
+  const isLogin = state.authTab === 'login';
+  const heights = [38,52,30,60,44,34,56];
+  const colors = ['var(--pop-red)','var(--pop-mustard)','var(--pop-teal)','var(--pop-navy)','var(--pop-green)','var(--pop-plum)','var(--pop-mustard)'];
+  const shelf = `<div class="shelf-strip">${heights.map((h,i)=>`<div class="spine" style="height:${h}px;width:${i===2?16:11}px;background:${colors[i]};"></div>`).join('')}</div>`;
+  return `
+  <div class="auth-wrap">
+    <div class="glass auth-card">
+      ${shelf}
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-name">ShelfShare</div>
+      </div>
+      <div class="eyebrow" style="margin-bottom:14px;">campus textbook exchange</div>
+      <h1 class="auth-title">${isLogin ? 'Welcome back.' : 'Start your shelf.'}</h1>
+      <div class="auth-sub">${isLogin ? 'Sign in to track, lend, and borrow textbooks.' : 'Create an account to list and borrow books on campus.'}</div>
+
+      <div class="tabs">
+        <div class="tab ${isLogin?'active':''}" onclick="setAuthTab('login')">Log in</div>
+        <div class="tab ${!isLogin?'active':''}" onclick="setAuthTab('register')">Register</div>
+      </div>
+
+      ${isLogin ? `
+        <form onsubmit="return handleLogin(event)">
+          <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@university.edu" required /></div>
+          <div class="field"><label>Password</label><input type="password" id="login-password" placeholder="••••••••" required /></div>
+          <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="login-btn" type="submit">Log in</button>
+        </form>
+      ` : `
+        <form onsubmit="return handleRegister(event)">
+          <div class="field"><label>Full name</label><input type="text" id="reg-name" placeholder="Ada Lovelace" required /></div>
+          <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="you@university.edu" required /></div>
+          <div class="field"><label>Password</label><input type="password" id="reg-password" placeholder="••••••••" required /></div>
+          <div class="field-row">
+            <div class="field"><label>Phone (optional)</label><input type="text" id="reg-phone" placeholder="98765xxxxx" /></div>
+            <div class="field"><label>Role</label>
+              <select id="reg-role">
+                <option value="Student">Student</option>
+                <option value="Faculty">Faculty</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-top:8px;" id="reg-btn" type="submit">Create account</button>
+        </form>
+      `}
+      <div class="tiny" style="margin-top:20px;text-align:center;">
+        API: <span id="api-base-label" style="cursor:pointer;text-decoration:underline;" onclick="promptApiBase()">${escapeHtml(state.apiBase)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setAuthTab(tab){ state.authTab = tab; render(); }
+
+function promptApiBase(){
+  const val = prompt('Backend API base URL (your FastAPI server must allow CORS from this page):', state.apiBase);
+  if(val){ state.apiBase = val.replace(/\/$/,''); render(); }
+}
+
+async function handleLogin(e){
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  try{
+    const data = await api('/users/login', {method:'POST', body:{email, password}});
+    state.token = data.access_token;
+    const payload = decodeJwt(state.token);
+    state.userId = payload.sub;
+    state.page = 'dashboard';
+    toast('Welcome back!');
+    render();
+    loadDashboard();
+  }catch(err){
+    toast(err.message, 'err');
+    btn.disabled = false; btn.innerHTML = 'Log in';
+  }
+  return false;
+}
+
+async function handleRegister(e){
+  e.preventDefault();
+  const body = {
+    full_name: document.getElementById('reg-name').value,
+    email: document.getElementById('reg-email').value,
+    password: document.getElementById('reg-password').value,
+    phone: document.getElementById('reg-phone').value || null,
+    role: document.getElementById('reg-role').value
+  };
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  try{
+    await api('/users/register', {method:'POST', body});
+    toast('Account created — log in to continue.');
+    state.authTab = 'login';
+    render();
+  }catch(err){
+    toast(err.message, 'err');
+    btn.disabled = false; btn.innerHTML = 'Create account';
+  }
+  return false;
+}
+
+function logout(){
+  state.token = null; state.userId = null; state.page = 'auth'; state.cache = {};
+  render();
+}
+
+// ================= SHELL =================
+const NAV = [
+  {id:'dashboard', label:'Dashboard', icon:'◈'},
+  {id:'browse', label:'Browse & Search', icon:'⌕'},
+  {id:'add', label:'Add a Book', icon:'✦'},
+  {id:'rentals', label:'My Rentals', icon:'⟲'},
+  {id:'wishlist', label:'Wishlist', icon:'♡'},
+];
+
+function renderShell(){
+  return `
+  <div class="shell">
+    <div class="sidebar glass" style="border-radius:0;">
+      <div class="brand"><div class="brand-mark"></div><div class="brand-name">ShelfShare</div></div>
+      ${NAV.map(n=>`
+        <div class="navlink ${state.page===n.id?'active':''}" onclick="goPage('${n.id}')">
+          <span>${n.icon}</span><span>${n.label}</span><span class="dot"></span>
+        </div>
+      `).join('')}
+      <div class="sidebar-foot">
+        <div class="tiny" style="margin-bottom:10px;">User #${escapeHtml(state.userId||'?')}</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="logout()">Log out</button>
+      </div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="page-title">${pageTitle()}</div>
+          <div class="page-sub">${pageSub()}</div>
+        </div>
+        <div class="settings-btn" title="Backend API base URL" onclick="promptApiBase()">⚙</div>
+      </div>
+      <div id="page-content">${renderPage()}</div>
+    </div>
+  </div>`;
+}
+
+function pageTitle(){
+  return {
+    dashboard:'Your shelf, at a glance',
+    browse:'Browse & search',
+    add:'Add a book',
+    rentals:'My rentals',
+    wishlist:'Wishlist'
+  }[state.page] || '';
+}
+function pageSub(){
+  return {
+    dashboard:'A quiet overview of activity across campus.',
+    browse:"Find a textbook by keyword, or see what's available now.",
+    add:'Scan a cover to auto-fill details, or enter a book by hand.',
+    rentals:'Books currently on loan to you.',
+    wishlist:"Books you're keeping an eye on."
+  }[state.page] || '';
+}
+
+function goPage(page){
+  state.page = page;
+  render();
+  if(page==='dashboard') loadDashboard();
+  if(page==='browse') loadAvailable();
+  if(page==='rentals') loadRentals();
+  if(page==='wishlist') loadWishlist();
+}
+
+function renderPage(){
+  switch(state.page){
+    case 'dashboard': return `<div id="dash-root">${loaderBlock()}</div>`;
+    case 'browse': return renderBrowse();
+    case 'add': return renderAdd();
+    case 'rentals': return `<div id="rentals-root">${loaderBlock()}</div>`;
+    case 'wishlist': return `<div id="wishlist-root">${loaderBlock()}</div>`;
+    default: return '';
+  }
+}
+
+function loaderBlock(){
+  return `<div class="glass empty"><span class="loader"></span></div>`;
+}
+
+// ================= DASHBOARD =================
+async function loadDashboard(){
+  const root = document.getElementById('dash-root');
+  if(!root) return;
+  try{
+    const stats = await api('/dashboard/stats');
+    const entries = (stats && typeof stats === 'object') ? Object.entries(stats) : [];
+    if(entries.length === 0){
+      root.innerHTML = `<div class="glass empty"><h3>No stats yet</h3><div class="muted">Your dashboard will fill in as activity happens.</div></div>`;
+      return;
+    }
+    root.innerHTML = `<div class="grid grid-4">
+      ${entries.map(([k,v])=>`
+        <div class="glass stat-card">
+          <div class="stat-label">${escapeHtml(fmtLabel(k))}</div>
+          <div class="stat-num">${escapeHtml(typeof v === 'object' ? JSON.stringify(v) : v)}</div>
+        </div>
+      `).join('')}
+    </div>`;
+  }catch(err){
+    root.innerHTML = `<div class="glass empty"><h3>Couldn't load stats</h3><div class="muted">${escapeHtml(err.message)}</div></div>`;
+  }
+}
+
+// ================= BROWSE / SEARCH =================
+function renderBrowse(){
+  return `
+    <div class="glass card" style="margin-bottom:22px;">
+      <form onsubmit="return handleSearch(event)" style="display:flex;gap:10px;">
+        <input type="text" id="search-input" placeholder="Search by title, author, subject…" />
+        <button class="btn btn-primary" type="submit">Search</button>
+        <button class="btn btn-ghost" type="button" onclick="loadAvailable()">Show all available</button>
+      </form>
+    </div>
+    <div id="browse-results">${loaderBlock()}</div>
+  `;
+}
+
+async function handleSearch(e){
+  e.preventDefault();
+  const keyword = document.getElementById('search-input').value.trim();
+  const root = document.getElementById('browse-results');
+  root.innerHTML = loaderBlock();
+  if(!keyword){ loadAvailable(); return false; }
+  try{
+    const results = await api('/search/', {method:'POST', body:{keyword}});
+    renderBookGrid(results, 'browse-results');
+  }catch(err){
+    root.innerHTML = `<div class="glass empty"><h3>Search failed</h3><div class="muted">${escapeHtml(err.message)}</div></div>`;
+  }
+  return false;
+}
+
+async function loadAvailable(){
+  const root = document.getElementById('browse-results');
+  if(root) root.innerHTML = loaderBlock();
+  try{
+    const results = await api('/books/available');
+    renderBookGrid(results, 'browse-results');
+  }catch(err){
+    if(root) root.innerHTML = `<div class="glass empty"><h3>Couldn't load books</h3><div class="muted">${escapeHtml(err.message)}</div></div>`;
+  }
+}
+
+function renderBookGrid(list, targetId){
+  const root = document.getElementById(targetId);
+  if(!root) return;
+  if(!Array.isArray(list) || list.length === 0){
+    root.innerHTML = `<div class="glass empty"><h3>No books found</h3><div class="muted">Try a different keyword, or check back later.</div></div>`;
+    return;
+  }
+  state.cache.books = state.cache.books || {};
+  list.forEach(b => { if(b && b.id!=null) state.cache.books[b.id] = b; });
+  root.innerHTML = `<div class="grid grid-3">
+    ${list.map(b => bookCard(b)).join('')}
+  </div>`;
+}
+
+const SPINE_COLORS = ['var(--pop-mustard)','var(--pop-teal)','var(--pop-red)','var(--pop-navy)','var(--pop-green)','var(--pop-plum)'];
+function spineColorFor(seed){
+  const s = String(seed || 'x');
+  let h = 0;
+  for(let i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; }
+  return SPINE_COLORS[h % SPINE_COLORS.length];
+}
+
+function bookCard(b){
+  const id = b.id ?? '';
+  const title = b.title ?? 'Untitled';
+  const author = b.author ?? (Array.isArray(b.authors) ? b.authors.join(', ') : '');
+  const subject = b.subject ?? '';
+  const publisher = b.publisher ?? '';
+  const branch = b.branch ?? '';
+  const spine = spineColorFor(subject || branch || title || id);
+  const img = b.image_url
+    ? `<img class="book-cover" src="${escapeHtml(b.image_url)}" onerror="this.outerHTML='&lt;div class=&quot;book-cover-spine&quot; style=&quot;--spine-color:${spine}&quot;&gt;&lt;span&gt;${escapeHtml(title)}&lt;/span&gt;&lt;/div&gt;'" />`
+    : `<div class="book-cover-spine" style="--spine-color:${spine}"><span>${escapeHtml(title)}</span></div>`;
+  return `
+    <div class="glass book-card" style="--spine-color:${spine}">
+      ${img}
+      <div class="book-title">${escapeHtml(title)}</div>
+      <div class="book-author">${escapeHtml(author)}</div>
+      <div class="book-meta">
+        ${subject ? `<span class="chip">${escapeHtml(subject)}</span>`:''}
+        ${branch ? `<span class="chip">${escapeHtml(branch)}</span>`:''}
+        ${publisher ? `<span class="chip">${escapeHtml(publisher)}</span>`:''}
+      </div>
+      <div class="book-actions">
+        <button class="btn btn-lamp btn-sm" onclick="openBorrowModal(${JSON.stringify(String(id))})">Borrow</button>
+        <button class="btn btn-ghost btn-sm" onclick="reserveBook(${JSON.stringify(String(id))})">Reserve</button>
+        <button class="btn btn-ghost btn-sm" onclick="wishlistBook(${JSON.stringify(String(id))})">♡ Wishlist</button>
+      </div>
+    </div>
+  `;
+}
+
+async function reserveBook(bookId){
+  try{
+    await api('/reservations/', {method:'POST', body:{user_id: Number(state.userId), book_id: Number(bookId)}});
+    toast('Reservation placed.');
+  }catch(err){ toast(err.message, 'err'); }
+}
+
+async function wishlistBook(bookId){
+  try{
+    await api('/wishlist/', {method:'POST', body:{book_id: Number(bookId)}});
+    toast('Added to wishlist.');
+  }catch(err){ toast(err.message, 'err'); }
+}
+
+function openBorrowModal(bookId){
+  const today = new Date().toISOString().slice(0,10);
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.id = 'borrow-modal-back';
+  back.innerHTML = `
+    <div class="glass modal">
+      <h3 style="margin-bottom:16px;">Borrow this book</h3>
+      <form onsubmit="return submitBorrow(event, '${bookId}')">
+        <div class="field"><label>Issue date</label><input type="date" id="borrow-issue" value="${today}" required /></div>
+        <div class="field"><label>Due date</label><input type="date" id="borrow-due" required /></div>
+        <div style="display:flex;gap:10px;margin-top:6px;">
+          <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeModal('borrow-modal-back')">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">Confirm borrow</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(back);
+}
+
+function closeModal(id){ const el = document.getElementById(id); if(el) el.remove(); }
+
+async function submitBorrow(e, bookId){
+  e.preventDefault();
+  const issue_date = document.getElementById('borrow-issue').value;
+  const due_date = document.getElementById('borrow-due').value;
+  try{
+    await api('/rentals/borrow', {method:'POST', body:{
+      user_id: Number(state.userId), book_id: Number(bookId), issue_date, due_date
+    }});
+    toast('Book borrowed — enjoy the read.');
+    closeModal('borrow-modal-back');
+  }catch(err){ toast(err.message, 'err'); }
+  return false;
+}
+
+// ================= ADD BOOK =================
+function renderAdd(){
+  return `
+    <div class="subtabs">
+      <div class="subtab ${state.addTab==='scan'?'active':''}" onclick="setAddTab('scan')">Scan a cover</div>
+      <div class="subtab ${state.addTab==='manual'?'active':''}" onclick="setAddTab('manual')">Enter manually</div>
+    </div>
+    <div class="glass card" style="max-width:640px;">
+      ${state.addTab==='scan' ? renderScanTab() : renderManualTab()}
+    </div>
+  `;
+}
+
+function setAddTab(tab){ state.addTab = tab; state.scanResult = null; state.scanFile = null; render(); }
+
+function renderScanTab(){
+  if(state.scanResult){
+    const r = state.scanResult;
+    return `
+      <div class="eyebrow" style="margin-bottom:14px;">scanned — confirm details</div>
+      <form onsubmit="return submitConfirm(event)">
+        <div class="field"><label>Title</label><input type="text" id="cf-title" value="${escapeHtml(r.title||'')}" required /></div>
+        <div class="field"><label>Author</label><input type="text" id="cf-author" value="${escapeHtml((r.authors||[]).join(', '))}" required /></div>
+        <div class="field-row">
+          <div class="field"><label>Publisher</label><input type="text" id="cf-publisher" value="${escapeHtml(r.publisher||'')}" /></div>
+          <div class="field"><label>Edition</label><input type="text" id="cf-edition" value="${escapeHtml(r.edition||'')}" /></div>
+        </div>
+        <div class="field"><label>Subject</label><input type="text" id="cf-subject" value="${escapeHtml(r.subject||'')}" /></div>
+        <div class="field-row">
+          <div class="field"><label>ISBN</label><input type="text" id="cf-isbn" placeholder="978-…" /></div>
+          <div class="field"><label>Branch</label><input type="text" id="cf-branch" placeholder="e.g. CSE" required /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Semester</label><input type="number" id="cf-semester" min="1" max="12" required /></div>
+          <div class="field"><label>Cover image URL</label><input type="text" id="cf-image" placeholder="https://…" /></div>
+        </div>
+        <div class="field"><label>Description</label><textarea id="cf-description" rows="3" placeholder="Condition, notes, edition quirks…"></textarea></div>
+        <div style="display:flex;gap:10px;">
+          <button type="button" class="btn btn-ghost" style="flex:1;" onclick="cancelScan()">Start over</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;" id="confirm-btn">Save book</button>
+        </div>
+      </form>
+    `;
+  }
+  return `
+    <div class="eyebrow" style="margin-bottom:14px;">ai cover scan</div>
+    <div class="drop" onclick="document.getElementById('scan-file-input').click()" id="drop-zone">
+      <div style="font-size:26px;margin-bottom:8px;">⤒</div>
+      <div style="font-weight:600;margin-bottom:4px;">Click to upload a cover photo</div>
+      <div class="tiny">We'll pull the title, author, publisher, edition and subject automatically.</div>
+    </div>
+    <input type="file" id="scan-file-input" accept="image/*" style="display:none;" onchange="handleScanFile(event)" />
+    <div id="scan-preview-wrap"></div>
+  `;
+}
+
+function handleScanFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  state.scanFile = file;
+  const url = URL.createObjectURL(file);
+  const wrap = document.getElementById('scan-preview-wrap');
+  wrap.innerHTML = `
+    <img class="scan-preview" src="${url}" />
+    <button class="btn btn-primary" style="width:100%;" id="scan-btn" onclick="runScan()">Scan cover</button>
+  `;
+}
+
+async function runScan(){
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  try{
+    const form = new FormData();
+    form.append('file', state.scanFile);
+    const result = await api('/scan/', {method:'POST', body:form, isForm:true});
+    state.scanResult = result;
+    render();
+    toast('Cover scanned — check the details below.');
+  }catch(err){
+    toast(err.message, 'err');
+    btn.disabled = false; btn.innerHTML = 'Scan cover';
+  }
+}
+
+function cancelScan(){ state.scanResult = null; state.scanFile = null; render(); }
+
+async function submitConfirm(e){
+  e.preventDefault();
+  const btn = document.getElementById('confirm-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  const body = {
+    title: document.getElementById('cf-title').value,
+    author: document.getElementById('cf-author').value,
+    isbn: document.getElementById('cf-isbn').value || null,
+    publisher: document.getElementById('cf-publisher').value || null,
+    edition: document.getElementById('cf-edition').value || null,
+    subject: document.getElementById('cf-subject').value || null,
+    branch: document.getElementById('cf-branch').value,
+    semester: Number(document.getElementById('cf-semester').value),
+    description: document.getElementById('cf-description').value || null,
+    image_url: document.getElementById('cf-image').value || null
+  };
+  try{
+    const saved = await api('/books/confirm', {method:'POST', body});
+    toast('Book saved to ShelfShare.');
+    state.scanResult = null; state.scanFile = null;
+    maybeOfferCopies(saved);
+  }catch(err){
+    toast(err.message, 'err');
+    btn.disabled = false; btn.innerHTML = 'Save book';
+  }
+  return false;
+}
+
+function renderManualTab(){
+  return `
+    <div class="eyebrow" style="margin-bottom:14px;">manual entry</div>
+    <form onsubmit="return submitManual(event)">
+      <div class="field"><label>Title</label><input type="text" id="mn-title" required /></div>
+      <div class="field"><label>Author</label><input type="text" id="mn-author" required /></div>
+      <div class="field-row">
+        <div class="field"><label>ISBN</label><input type="text" id="mn-isbn" required /></div>
+        <div class="field"><label>Publisher</label><input type="text" id="mn-publisher" required /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Edition</label><input type="text" id="mn-edition" required /></div>
+        <div class="field"><label>Subject</label><input type="text" id="mn-subject" required /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Branch</label><input type="text" id="mn-branch" placeholder="e.g. CSE" required /></div>
+        <div class="field"><label>Semester</label><input type="number" id="mn-semester" min="1" max="12" required /></div>
+      </div>
+      <div class="field"><label>Cover image URL</label><input type="text" id="mn-image" placeholder="https://…" required /></div>
+      <div class="field"><label>Description</label><textarea id="mn-description" rows="3" required></textarea></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;" id="manual-btn">Save book</button>
+    </form>
+  `;
+}
+
+async function submitManual(e){
+  e.preventDefault();
+  const btn = document.getElementById('manual-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
+  const body = {
+    title: document.getElementById('mn-title').value,
+    author: document.getElementById('mn-author').value,
+    isbn: document.getElementById('mn-isbn').value,
+    publisher: document.getElementById('mn-publisher').value,
+    edition: document.getElementById('mn-edition').value,
+    subject: document.getElementById('mn-subject').value,
+    branch: document.getElementById('mn-branch').value,
+    semester: Number(document.getElementById('mn-semester').value),
+    description: document.getElementById('mn-description').value,
+    image_url: document.getElementById('mn-image').value
+  };
+  try{
+    const saved = await api('/books/', {method:'POST', body});
+    toast('Book saved to ShelfShare.');
+    document.querySelector('#page-content form').reset();
+    maybeOfferCopies(saved);
+  }catch(err){
+    toast(err.message, 'err');
+  }
+  btn.disabled = false; btn.innerHTML = 'Save book';
+  return false;
+}
+
+function maybeOfferCopies(saved){
+  const bookId = saved && saved.id;
+  if(bookId == null) return;
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.id = 'copies-modal-back';
+  back.innerHTML = `
+    <div class="glass modal">
+      <h3 style="margin-bottom:10px;">Add copies?</h3>
+      <div class="muted" style="margin-bottom:16px;font-size:13.5px;">Register how many physical copies of this book are available to lend, and where they're shelved.</div>
+      <form onsubmit="return submitCopies(event, ${bookId})">
+        <div class="field-row">
+          <div class="field"><label>Number of copies</label><input type="number" id="cp-count" min="1" value="1" required /></div>
+          <div class="field"><label>Rack</label><input type="text" id="cp-rack" placeholder="e.g. R3-B" required /></div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeModal('copies-modal-back')">Skip for now</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">Add copies</button>
+        </div>
+      </form>
+    </div>`;
+  document.body.appendChild(back);
+}
+
+async function submitCopies(e, bookId){
+  e.preventDefault();
+  const body = {
+    number_of_copies: Number(document.getElementById('cp-count').value),
+    rack: document.getElementById('cp-rack').value
+  };
+  try{
+    await api(`/books/${bookId}/copies`, {method:'POST', body});
+    toast('Copies added.');
+    closeModal('copies-modal-back');
+  }catch(err){ toast(err.message, 'err'); }
+  return false;
+}
+
+// ================= RENTALS =================
+async function loadRentals(){
+  const root = document.getElementById('rentals-root');
+  if(!root) return;
+  try{
+    const rentals = await api(`/rentals/my-books/${state.userId}`);
+    if(!Array.isArray(rentals) || rentals.length === 0){
+      root.innerHTML = `<div class="glass empty"><h3>No books on loan</h3><div class="muted">Borrowed books will show up here.</div></div>`;
+      return;
+    }
+    root.innerHTML = rentals.map(r => rentalRow(r)).join('');
+  }catch(err){
+    root.innerHTML = `<div class="glass empty"><h3>Couldn't load rentals</h3><div class="muted">${escapeHtml(err.message)}</div></div>`;
+  }
+}
+
+function rentalRow(r){
+  const id = r.id;
+  const status = r.status || 'active';
+  const isReturned = status && status.toLowerCase() !== 'active' && status.toLowerCase() !== 'borrowed';
+  const rating = r.rating;
+  return `
+    <div class="glass list-row">
+      <div>
+        <div style="font-weight:700;font-family:var(--serif);font-size:16px;">${escapeHtml(r.title || ('Rental #'+id))}</div>
+        <div class="tiny" style="margin-top:4px;">
+          Issued ${escapeHtml(r.issue_date||'—')} · Due ${escapeHtml(r.due_date||'—')}
+          ${r.fine ? ` · Fine ₹${escapeHtml(r.fine)}` : ''}
+          · <span class="chip">${escapeHtml(status)}</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${!isReturned ? `<button class="btn btn-ghost btn-sm" onclick="returnRental(${id})">Return</button>` : ''}
+        ${isReturned && rating == null ? rateWidget(id) : ''}
+        ${rating != null ? `<span class="tiny">Rated ${escapeHtml(rating)}★</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function rateWidget(rentalId){
+  return `
+    <div class="stars" id="stars-${rentalId}">
+      ${[1,2,3,4,5].map(n=>`<span class="star" onclick="rateRental(${rentalId}, ${n})">★</span>`).join('')}
+    </div>
+  `;
+}
+
+async function returnRental(id){
+  try{
+    await api(`/rentals/return/${id}`, {method:'POST'});
+    toast('Book returned.');
+    loadRentals();
+  }catch(err){ toast(err.message, 'err'); }
+}
+
+async function rateRental(id, rating){
+  try{
+    await api('/rentals/rate', {method:'POST', body:{rental_id:id, rating}});
+    toast('Thanks for rating!');
+    loadRentals();
+  }catch(err){ toast(err.message, 'err'); }
+}
+
+// ================= WISHLIST =================
+async function loadWishlist(){
+  const root = document.getElementById('wishlist-root');
+  if(!root) return;
+  root.innerHTML = loaderBlock();
+  try{
+    const [wishlist, recs] = await Promise.all([
+      api(`/wishlist/${state.userId}`).catch(()=>[]),
+      api(`/wishlist/recommend/${state.userId}`).catch(()=>[])
+    ]);
+    const wl = Array.isArray(wishlist) ? wishlist : [];
+    const rc = Array.isArray(recs) ? recs : [];
+    root.innerHTML = `
+      <div style="margin-bottom:30px;">
+        <div class="section-head"><h3>Saved for later</h3></div>
+        ${wl.length === 0 ? `<div class="glass empty"><div class="muted">Nothing saved yet — wishlist a book from Browse & Search.</div></div>` : `
+          ${wl.map(w => `
+            <div class="glass list-row">
+              <div>
+                <div style="font-weight:700;font-family:var(--serif);font-size:16px;">${escapeHtml(w.title || ('Book #'+w.book_id))}</div>
+                ${w.author ? `<div class="tiny">${escapeHtml(w.author)}</div>` : ''}
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="removeWishlist(${w.id})">Remove</button>
+            </div>
+          `).join('')}
+        `}
+      </div>
+      <div>
+        <div class="section-head"><h3>Recommended for you</h3></div>
+        ${rc.length === 0 ? `<div class="glass empty"><div class="muted">Recommendations will appear as you use ShelfShare more.</div></div>` : `
+          <div class="grid grid-3">${rc.map(b=>bookCard(b)).join('')}</div>
+        `}
+      </div>
+    `;
+  }catch(err){
+    root.innerHTML = `<div class="glass empty"><h3>Couldn't load wishlist</h3><div class="muted">${escapeHtml(err.message)}</div></div>`;
+  }
+}
+
+async function removeWishlist(id){
+  try{
+    await api(`/wishlist/${id}`, {method:'DELETE'});
+    toast('Removed from wishlist.');
+    loadWishlist();
+  }catch(err){ toast(err.message, 'err'); }
+}
+
+// ---------- init ----------
+render();
+</script>
+</body>
+</html>
