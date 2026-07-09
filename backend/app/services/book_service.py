@@ -1,23 +1,43 @@
-import os
-import shutil
+from sqlalchemy.orm import Session
+from app.models.book import Book
+from app.models.book_copy import BookCopy
+from app.schemas.book import BookCreate
 
-from app.ai.llm import extract_metadata
 
+def create_book(
+    db: Session,
+    book: BookCreate,
+    owner_id: int
+):
 
-def scan_book(file):
-
-    upload_folder = "uploads/book_images"
-
-    os.makedirs(upload_folder, exist_ok=True)
-
-    file_path = os.path.join(
-        upload_folder,
-        file.filename
+    new_book = Book(
+        title=book.title,
+        author=book.author,
+        isbn=book.isbn,
+        publisher=book.publisher,
+        edition=book.edition,
+        subject=book.subject,
+        branch=book.branch,
+        semester=book.semester,
+        description=book.description,
+        image_url=book.image_url,
+        owner_id=owner_id
     )
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    db.add(new_book)
+    db.commit()
+    db.refresh(new_book)
 
-    metadata = extract_metadata(file_path)
+    return new_book
 
-    return metadata
+
+def available_books(db: Session):
+
+    books = (
+        db.query(Book)
+        .join(BookCopy)
+        .filter(BookCopy.status == "Available")
+        .all()
+    )
+
+    return books

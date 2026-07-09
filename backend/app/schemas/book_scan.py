@@ -6,3 +6,5 @@ class BookScanResponse(BaseModel):
     publisher: str
     edition: str
     subject: str
+    isbn: str = ""
+    description: str = ""
