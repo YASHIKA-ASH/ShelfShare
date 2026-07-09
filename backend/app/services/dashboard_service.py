@@ -5,7 +5,7 @@ from app.models.book import Book
 from app.models.book_copy import BookCopy
 from app.models.rental import Rental
 from app.models.wishlist import Wishlist
-
+from app.models.reservation import Reservation
 
 def dashboard_stats(db: Session):
 
@@ -14,7 +14,7 @@ def dashboard_stats(db: Session):
     total_books = db.query(Book).count()
 
     total_copies = db.query(BookCopy).count()
-
+    reservation_count = db.query(Reservation).count()
     available_books = db.query(BookCopy).filter(
         BookCopy.status == "Available"
     ).count()
@@ -36,7 +36,7 @@ def dashboard_stats(db: Session):
         "total_users": total_users,
 
         "total_books": total_books,
-
+"reservation_count": reservation_count,
         "total_copies": total_copies,
 
         "available_books": available_books,
