@@ -17,9 +17,9 @@ async def scan_image(
     metadata = scan_book(file)
 
     return BookScanResponse(
-        title=metadata["title"],
-        authors=metadata["authors"],
-        publisher=metadata["publisher"],
-        edition=metadata["edition"],
-        subject=metadata["subject"]
+        title=metadata.get("title", ""),
+        authors=metadata.get("authors", []),
+        publisher=metadata.get("publisher", ""),
+        edition=metadata.get("edition", ""),
+        subject=metadata.get("subject", "")
     )

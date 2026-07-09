@@ -2,12 +2,14 @@ import os
 import json
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 load_dotenv()
 
 client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
+
 
 def extract_metadata(image_path: str):
 
@@ -17,9 +19,9 @@ def extract_metadata(image_path: str):
     prompt = """
 You are an expert librarian.
 
-Analyze this textbook cover image.
+Analyze this textbook cover image carefully.
 
-Extract the following fields.
+Extract ONLY the following fields.
 
 Return ONLY valid JSON.
 
@@ -28,28 +30,28 @@ Return ONLY valid JSON.
     "authors":[],
     "publisher":"",
     "edition":"",
-    "subject":""
+    "subject":"",
+    "isbn":"",
+    "description":""
 }
 
-If a field is not visible, return an empty string.
+If any field is missing, return an empty string.
 """
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=[
             prompt,
-            {
-                "mime_type": "image/jpeg",
-                "data": image_bytes
-            }
+            types.Part.from_bytes(
+                data=image_bytes,
+                mime_type="image/jpeg"
+            )
         ]
     )
 
-    cleaned = (
-        response.text
-        .replace("```json", "")
-        .replace("```", "")
-        .strip()
-    )
+    text = response.text.strip()
 
-    return json.loads(cleaned)
+    if text.startswith("```json"):
+        text = text.replace("```json", "").replace("```", "").strip()
+
+    return json.loads(text)

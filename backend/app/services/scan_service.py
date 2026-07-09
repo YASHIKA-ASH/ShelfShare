@@ -1,7 +1,6 @@
 import os
 import shutil
 
-from app.ai.ocr import extract_text
 from app.ai.llm import extract_metadata
 
 
@@ -19,16 +18,6 @@ def scan_book(file):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    print("Saved Image:", file_path)
-
-    text = extract_text(file_path)
-
-    print("OCR OUTPUT:\n")
-    print(text)
-
-    metadata = extract_metadata(text)
-
-    print("AI OUTPUT:\n")
-    print(metadata)
+    metadata = extract_metadata(file_path)
 
     return metadata
