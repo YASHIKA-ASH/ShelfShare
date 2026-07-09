@@ -1,47 +1,23 @@
-from sqlalchemy.orm import Session
+import os
+import shutil
 
-from app.models.book import Book
-from app.schemas.book import BookCreate
-from app.models.rental import Rental
+from app.ai.llm import extract_metadata
 
-def create_book(
-    db: Session,
-    book: BookCreate,
-    owner_id: int
-):
 
-    db_book = Book(
-        title=book.title,
-        author=book.author,
-        isbn=book.isbn,
-        publisher=book.publisher,
-        edition=book.edition,
-        subject=book.subject,
-        branch=book.branch,
-        semester=book.semester,
-        description=book.description,
-        image_url=book.image_url,
-        owner_id=owner_id
+def scan_book(file):
+
+    upload_folder = "uploads/book_images"
+
+    os.makedirs(upload_folder, exist_ok=True)
+
+    file_path = os.path.join(
+        upload_folder,
+        file.filename
     )
 
-    db.add(db_book)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
 
-    db.commit()
+    metadata = extract_metadata(file_path)
 
-    db.refresh(db_book)
-
-    return db_book
-
-def available_books(db: Session):
-
-    rented_ids = db.query(
-        Rental.book_id
-    ).filter(
-        Rental.status == "Borrowed"
-    )
-
-    books = db.query(Book).filter(
-        ~Book.id.in_(rented_ids)
-    ).all()
-
-    return books
+    return metadata

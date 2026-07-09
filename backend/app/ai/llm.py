@@ -9,33 +9,47 @@ client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
+def extract_metadata(image_path: str):
 
-def extract_metadata(ocr_text: str):
+    with open(image_path, "rb") as f:
+        image_bytes = f.read()
 
-    prompt = f"""
+    prompt = """
 You are an expert librarian.
 
-Extract the following fields from this OCR text.
+Analyze this textbook cover image.
+
+Extract the following fields.
 
 Return ONLY valid JSON.
 
-Fields:
-- title
-- authors
-- publisher
-- edition
-- subject
+{
+    "title":"",
+    "authors":[],
+    "publisher":"",
+    "edition":"",
+    "subject":""
+}
 
-OCR Text:
-
-{ocr_text}
+If a field is not visible, return an empty string.
 """
 
     response = client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=prompt
+        contents=[
+            prompt,
+            {
+                "mime_type": "image/jpeg",
+                "data": image_bytes
+            }
+        ]
     )
 
-    cleaned = response.text.replace("```json", "").replace("```", "").strip()
+    cleaned = (
+        response.text
+        .replace("```json", "")
+        .replace("```", "")
+        .strip()
+    )
 
     return json.loads(cleaned)
