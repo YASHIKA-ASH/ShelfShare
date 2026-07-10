@@ -15,6 +15,8 @@ from app.models.book_copy import BookCopy
 from app.routers.book_copy import router as book_copy_router
 from app.models.reservation import Reservation
 from app.routers.reservation import router as reservation_router
+from app.models.payment import Payment
+from app.routers.payment import router as payment_router
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -40,6 +42,7 @@ app.include_router(rental_router)
 app.include_router(wishlist_router)
 app.include_router(search_router)
 app.include_router(reservation_router)
+app.include_router(payment_router)
 @app.get("/")
 def root():
     return {
