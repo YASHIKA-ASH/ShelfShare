@@ -1,7 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List
-
+from app.services.book_copy import (
+    create_book_copies,
+    get_book_copies
+)
 from app.dependencies import get_db
 
 from app.schemas.book_copy import (
@@ -34,3 +37,10 @@ def add_copies(
         book_id,
         request
     )
+
+@router.get("/books/{book_id}/copies")
+def load_book_copies(
+    book_id: int,
+    db: Session = Depends(get_db)
+):
+    return get_book_copies(db, book_id)

@@ -42,3 +42,14 @@ def create_book_copies(
     db.commit()
 
     return copies
+
+def get_book_copies(
+    db: Session,
+    book_id: int
+):
+
+    copies = db.query(BookCopy).filter(
+        BookCopy.book_id == book_id
+    ).all()
+
+    return copies
