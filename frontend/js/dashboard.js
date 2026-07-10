@@ -36,13 +36,13 @@ async function loadDashboard() {
             data.borrowed_books ?? 0;
 
         document.getElementById("reservationCount").innerText =
-            data.total_reservations ?? 0;
+        data.reservation_count ?? 0;
 
         document.getElementById("pendingReservations").innerText =
             data.pending_reservations ?? 0;
 
         document.getElementById("wishlistCount").innerText =
-            data.total_wishlist ?? 0;
+        data.wishlist_items ?? 0;
 
         document.getElementById("popularBook").innerText =
             data.popular_book ?? "N/A";

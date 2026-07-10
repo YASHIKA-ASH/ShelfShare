@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Payment</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <h2>📚 ShelfShare</h2>
+
+        <ul>
+
+            <li><a href="dashboard.html">🏠 Dashboard</a></li>
+
+            <li><a href="books.html">📖 Books</a></li>
+
+            <li><a href="borrow.html">🔄 Borrow</a></li>
+
+            <li><a href="wishlist.html">❤️ Wishlist</a></li>
+
+            <li><a href="reservation.html">📅 Reservations</a></li>
+
+        </ul>
+
+    </div>
+
+    <!-- Main -->
+
+    <div class="main">
+
+        <div class="navbar">
+
+            <h1>Rental Payment</h1>
+
+            <p>Complete payment to borrow your book</p>
+
+        </div>
+
+        <div class="form-card">
+
+            <h2>Rental Fee</h2>
+
+            <h1 style="color:#2563eb;">₹50</h1>
+
+            <br>
+
+            <label><b>Select Payment Method</b></label>
+
+            <select id="method">
+
+                <option>UPI</option>
+
+                <option>Credit Card</option>
+
+                <option>Debit Card</option>
+
+                <option>Net Banking</option>
+
+                <option>Wallet</option>
+
+            </select>
+
+            <br><br>
+
+            <button
+
+                class="primary-btn"
+
+                onclick="pay()">
+
+                Pay Now
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="loader" class="loader hidden">
+
+    <div class="spinner"></div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/api.js"></script>
+
+<script src="js/auth.js"></script>
+
+<script src="js/payment.js"></script>
+
+</body>
+
+</html>

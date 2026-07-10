@@ -162,49 +162,21 @@ function searchBooks() {
 // Borrow Book
 // ===============================
 
-async function borrowBook(bookId) {
+async function borrowBook(bookId){
 
     const userId = prompt("Enter User ID");
 
-    if (!userId) return;
+    if(!userId){
 
-    try {
-
-        showLoader();
-
-        await apiPost("/rentals/borrow", {
-
-            user_id: Number(userId),
-
-            book_id: Number(bookId),
-
-            issue_date: new Date()
-                .toISOString()
-                .split("T")[0],
-
-            due_date: new Date(
-                Date.now() + 14 * 24 * 60 * 60 * 1000
-            )
-                .toISOString()
-                .split("T")[0]
-
-        });
-
-        hideLoader();
-
-        showToast("Book Borrowed Successfully");
-
-        loadBooks();
+        return;
 
     }
 
-    catch (err) {
+    localStorage.setItem("borrow_user",userId);
 
-        hideLoader();
+    localStorage.setItem("borrow_book",bookId);
 
-        showToast(err.message, "error");
-
-    }
+    window.location.href="payment.html";
 
 }
 

@@ -277,3 +277,14 @@ window.addEventListener(
     }
 
 );
+function goToPayment(bookId){
+
+    localStorage.setItem("book_id", bookId);
+
+    localStorage.setItem("user_id", 1);
+
+    localStorage.setItem("amount", 50);
+
+    window.location.href = "payment.html";
+
+}
