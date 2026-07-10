@@ -12,10 +12,10 @@ def dashboard_stats(db: Session):
     total_users = db.query(User).count()
 
     total_books = db.query(Book).count()
-
+    total_reservations = db.query(Reservation).count()
     total_copies = db.query(BookCopy).count()
     reservation_count = db.query(Reservation).count()
-    available_books = db.query(BookCopy).filter(
+    available_copies = db.query(BookCopy).filter(
         BookCopy.status == "Available"
     ).count()
 
@@ -36,12 +36,14 @@ def dashboard_stats(db: Session):
         "total_users": total_users,
 
         "total_books": total_books,
-"reservation_count": reservation_count,
+
         "total_copies": total_copies,
 
-        "available_books": available_books,
+        "available_copies": available_copies,
 
         "borrowed_books": borrowed_books,
+
+        "total_reservations": total_reservations,
 
         "active_rentals": active_rentals,
 
