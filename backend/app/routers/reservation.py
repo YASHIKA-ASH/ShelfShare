@@ -4,7 +4,10 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db
 
 from app.schemas.reservation import ReservationCreate
-from app.services.reservation_service import reserve_book
+from app.services.reservation_service import (
+    reserve_book,
+    get_user_reservations
+)
 
 router = APIRouter(
     prefix="/reservations",
@@ -18,3 +21,14 @@ def create_reservation(
     db: Session = Depends(get_db)
 ):
     return reserve_book(db, reservation)
+
+@router.get("/{user_id}")
+def load_reservations(
+
+    user_id: int,
+
+    db: Session = Depends(get_db)
+
+):
+
+    return get_user_reservations(db, user_id)

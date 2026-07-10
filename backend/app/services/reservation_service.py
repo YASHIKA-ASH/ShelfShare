@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from app.models.book import Book
 from app.models.reservation import Reservation
 from app.models.book import Book
 from app.schemas.reservation import ReservationCreate
@@ -47,3 +47,34 @@ def reserve_book(db: Session, reservation: ReservationCreate):
         "queue_position": queue_position,
         "status": new_reservation.status
     }
+def get_user_reservations(db: Session, user_id: int):
+
+    reservations = (
+        db.query(Reservation)
+        .filter(Reservation.user_id == user_id)
+        .all()
+    )
+
+    result = []
+
+    for reservation in reservations:
+
+        book = db.query(Book).filter(
+            Book.id == reservation.book_id
+        ).first()
+
+        result.append({
+
+            "id": reservation.id,
+
+            "title": book.title if book else "Unknown",
+
+            "author": book.author if book else "Unknown",
+
+            "position": reservation.queue_position,
+
+            "status": reservation.status
+
+        })
+
+    return result
